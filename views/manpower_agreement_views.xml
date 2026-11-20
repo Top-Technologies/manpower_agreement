@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List -->
+    <record id="manpower_agreement_view_list" model="ir.ui.view">
+        <field name="name">manpower.agreement.list</field>
+        <field name="model">manpower.agreement</field>
+        <field name="arch" type="xml">
+            <list decoration-warning="expiring_soon" decoration-muted="state in ('expired','terminated')">
+                <field name="name"/>
+                <field name="provider_id"/>
+                <field name="business_unit_id"/>
+                <field name="date_start"/>
+                <field name="date_end"/>
+                <field name="male_qty" optional="show"/>
+                <field name="female_qty" optional="show"/>
+                <field name="manpower_qty"/>
+                <field name="payment_frequency" optional="show"/>
+                <field name="responsible_id" optional="hide"/>
+                <field name="expiring_soon" column_invisible="1"/>
+                <field name="state" widget="badge"
+                       decoration-success="state == 'active'"
+                       decoration-warning="state == 'draft'"
+                       decoration-danger="state in ('expired','terminated')"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form -->
+    <record id="manpower_agreement_view_form" model="ir.ui.view">
+        <field name="name">manpower.agreement.form</field>
+        <field name="model">manpower.agreement</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_confirm" string="Confirm" type="object"
+                            class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_renew" string="Renew" type="object"
+                            invisible="state not in ('active', 'expired')"/>
+                    <button name="action_terminate" string="Terminate" type="object"
+                            invisible="state != 'active'"
+                            confirm="Terminate this agreement?"/>
+                    <field name="state" widget="statusbar"
+                           statusbar_visible="draft,active,expired"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_documents" type="object"
+                                class="oe_stat_button" icon="fa-folder-open-o">
+                            <field name="documents_count" widget="statinfo" string="Documents"/>
+                        </button>
+                    </div>
+                    <widget name="web_ribbon" title="Expiring Soon"
+                            bg_color="text-bg-warning" invisible="not expiring_soon"/>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" readonly="state != 'draft'"/></h1>
+                    </div>
+                    <group>
+                        <group string="Parties">
+                            <field name="provider_id" readonly="state != 'draft'"/>
+                            <field name="business_unit_id" readonly="state != 'draft'"/>
+                            <field name="previous_agreement_id" invisible="not previous_agreement_id"/>
+                        </group>
+                        <group string="Validity">
+                            <field name="agreement_date" readonly="state != 'draft'"/>
+                            <field name="date_start" readonly="state != 'draft'"/>
+                            <field name="date_end"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Contractual Terms" name="terms">
+                            <field name="terms" placeholder="Contractual terms and conditions..."/>
+                        </page>
+                        <page string="Manpower Distribution" name="distribution">
+                            <div class="alert alert-info mb-3" role="status">
+                                <strong>Manpower Distribution by Service Category and Gender</strong>
+                                <p class="mb-0">
+                                    Enter the number of workers supplied for each service category,
+                                    broken down by gender. Totals are calculated automatically.
+                                </p>
+                            </div>
+                            <field name="manpower_distribution_ids" 
+                                   readonly="state not in ('draft', 'active')"
+                                   context="{'default_agreement_id': id}">
+                                <list editable="bottom">
+                                    <field name="category_id" required="1"/>
+                                    <field name="male_qty"/>
+                                    <field name="female_qty"/>
+                                    <field name="total_qty" readonly="1" sum="Total Workers"/>
+                                    <field name="notes" optional="hide"/>
+                                </list>
+                            </field>
+                            <group class="mt-3">
+                                <group>
+                                    <label for="male_qty" string="Summary"/>
+                                    <div>
+                                        <strong>Total Male Workers:</strong>
+                                        <field name="male_qty" class="oe_inline" readonly="1"/>
+                                    </div>
+                                    <div>
+                                        <strong>Total Female Workers:</strong>
+                                        <field name="female_qty" class="oe_inline" readonly="1"/>
+                                    </div>
+                                    <div>
+                                        <strong>Total Workers:</strong>
+                                        <field name="manpower_qty" class="oe_inline" readonly="1"/>
+                                    </div>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Amendments" name="amendments">
+                            <separator string="Approved Amendments"/>
+                            <field name="amendment_ids" readonly="state != 'active'"
+                                   context="{'default_agreement_id': id}">
+                                <list>
+                                    <field name="date"/>
+                                    <field name="previous_qty"/>
+                                    <field name="new_qty"/>
+                                    <field name="reason"/>
+                                    <field name="approved_by_id"/>
+                                </list>
+                                <form>
+                                    <sheet>
+                                        <group>
+                                            <group>
+                                                <field name="date"/>
+                                                <field name="previous_qty" readonly="1"/>
+                                                <field name="new_qty" readonly="1"/>
+                                            </group>
+                                            <group>
+                                                <field name="reason"/>
+                                                <field name="approved_by_id"/>
+                                            </group>
+                                        </group>
+                                        <separator string="Amendment Distribution"/>
+                                        <field name="amendment_line_ids">
+                                            <list editable="bottom">
+                                                <field name="category_id" required="1"/>
+                                                <field name="previous_male_qty" readonly="1"/>
+                                                <field name="previous_female_qty" readonly="1"/>
+                                                <field name="male_qty"/>
+                                                <field name="female_qty"/>
+                                                <field name="total_qty" readonly="1" sum="New Total"/>
+                                            </list>
+                                        </field>
+                                    </sheet>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Cost and Payment" name="cost">
+                            <group>
+                                <group>
+                                    <field name="currency_id" invisible="1"/>
+                                    <field name="service_fee"/>
+                                    <field name="manpower_rate"/>
+                                    <field name="rate_basis"/>
+                                </group>
+                                <group>
+                                    <field name="payment_frequency"/>
+                                    <field name="other_charges"/>
+                                </group>
+                            </group>
+                            <field name="payment_terms" placeholder="Payment terms..."/>
+                        </page>
+                        <page string="Renewal" name="renewal">
+                            <group>
+                                <field name="notice_days"/>
+                                <field name="responsible_id"/>
+                                <field name="expiry_notified"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search -->
+    <record id="manpower_agreement_view_search" model="ir.ui.view">
+        <field name="name">manpower.agreement.search</field>
+        <field name="model">manpower.agreement</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="provider_id"/>
+                <field name="business_unit_id"/>
+                <filter name="active" string="Active" domain="[('state', '=', 'active')]"/>
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="expiring_30" string="Expiring in 30 Days"
+                        domain="[('state', '=', 'active'),
+                                 ('date_end', '&lt;=', (context_today() + relativedelta(days=30)).strftime('%Y-%m-%d'))]"/>
+                <filter name="expired" string="Expired" domain="[('state', '=', 'expired')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_provider" string="Provider" context="{'group_by': 'provider_id'}"/>
+                    <filter name="group_unit" string="Business Unit" context="{'group_by': 'business_unit_id'}"/>
+                    <filter name="group_state" string="Status" context="{'group_by': 'state'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_manpower_agreement" model="ir.actions.act_window">
+        <field name="name">Manpower Agreements</field>
+        <field name="res_model">manpower.agreement</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="manpower_agreement_view_search"/>
+    </record>
+</odoo>

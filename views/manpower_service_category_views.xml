@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- List View -->
+    <record id="manpower_service_category_view_list" model="ir.ui.view">
+        <field name="name">manpower.service.category.list</field>
+        <field name="model">manpower.service.category</field>
+        <field name="arch" type="xml">
+            <list string="Service Categories" default_order="sequence,name">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="code"/>
+                <field name="description"/>
+                <field name="active" widget="boolean_toggle"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="manpower_service_category_view_form" model="ir.ui.view">
+        <field name="name">manpower.service.category.form</field>
+        <field name="model">manpower.service.category</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <div class="oe_button_box" name="button_box"/>
+                    <widget name="web_ribbon" title="Archived"
+                            bg_color="text-bg-danger" invisible="active"/>
+                    <group>
+                        <group>
+                            <field name="active" invisible="1"/>
+                            <field name="name" placeholder="e.g. Security, Cleaning, Drivers..."/>
+                            <field name="code" placeholder="e.g. SEC, CLN, DRV..."/>
+                        </group>
+                        <group>
+                            <field name="sequence"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="description" placeholder="Description of this service category..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Search View -->
+    <record id="manpower_service_category_view_search" model="ir.ui.view">
+        <field name="name">manpower.service.category.search</field>
+        <field name="model">manpower.service.category</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="code"/>
+                <filter name="active" string="Active" domain="[('active', '=', True)]"/>
+                <filter name="archived" string="Archived" domain="[('active', '=', False)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_manpower_service_category" model="ir.actions.act_window">
+        <field name="name">Service Categories</field>
+        <field name="res_model">manpower.service.category</field>
+        <field name="view_mode">list,form</field>
+        <field name="context">{'search_default_active': 1}</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new service category
+            </p>
+            <p>
+                Service categories are used to classify the types of manpower services
+                provided under agreements (e.g., Security, Cleaning, Drivers, etc.).
+            </p>
+        </field>
+    </record>
+</odoo>

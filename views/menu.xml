@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_manpower_root" name="Manpower Agreements"
+              web_icon="base,static/description/icon.png"
+              groups="manpower_agreement.group_manpower_user" sequence="60"/>
+
+    <menuitem id="menu_manpower_agreements" name="Agreements"
+              parent="menu_manpower_root" action="action_manpower_agreement" sequence="10"/>
+
+    <menuitem id="menu_manpower_providers" name="Service Providers"
+              parent="menu_manpower_root" action="action_manpower_provider" sequence="20"/>
+
+    <menuitem id="menu_manpower_config" name="Configuration"
+              parent="menu_manpower_root" sequence="90"
+              groups="manpower_agreement.group_manpower_manager"/>
+
+    <menuitem id="menu_manpower_service_categories" name="Service Categories"
+              parent="menu_manpower_config" action="action_manpower_service_category" sequence="10"/>
+</odoo>

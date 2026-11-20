@@ -1,0 +1,21 @@
+{
+    'name': 'Manpower Supply Agreement Management',
+    'version': '18.0.2.0.0',
+    'summary': 'Manage manpower supply agreements with external providers',
+    'category': 'Human Resources',
+    'depends': ['base', 'mail', 'documents'],
+    'data': [
+        'security/security.xml',
+        'security/ir.model.access.csv',
+        'data/ir_sequence_data.xml',
+        'data/ir_cron_data.xml',
+        'data/manpower_service_category_data.xml',
+        'views/manpower_service_category_views.xml',
+        'views/manpower_agreement_views.xml',
+        'views/res_partner_views.xml',
+        'views/menu.xml',
+    ],
+    'license': 'LGPL-3',
+    'application': True,
+    'installable': True,
+}

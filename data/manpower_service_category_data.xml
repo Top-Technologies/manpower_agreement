@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <!-- Initial Service Categories -->
+        <record id="category_security" model="manpower.service.category">
+            <field name="name">Security</field>
+            <field name="code">SEC</field>
+            <field name="sequence">10</field>
+            <field name="description">Security personnel and guards</field>
+        </record>
+
+        <record id="category_cleaning" model="manpower.service.category">
+            <field name="name">Cleaning</field>
+            <field name="code">CLN</field>
+            <field name="sequence">20</field>
+            <field name="description">Cleaning and sanitation services</field>
+        </record>
+
+        <record id="category_housekeeping" model="manpower.service.category">
+            <field name="name">Housekeeping</field>
+            <field name="code">HSK</field>
+            <field name="sequence">30</field>
+            <field name="description">Housekeeping and facility maintenance</field>
+        </record>
+
+        <record id="category_gardening" model="manpower.service.category">
+            <field name="name">Gardening</field>
+            <field name="code">GRD</field>
+            <field name="sequence">40</field>
+            <field name="description">Gardening and landscaping services</field>
+        </record>
+
+        <record id="category_loading" model="manpower.service.category">
+            <field name="name">Loading &amp; Unloading</field>
+            <field name="code">LDU</field>
+            <field name="sequence">50</field>
+            <field name="description">Loading, unloading, and material handling</field>
+        </record>
+
+        <record id="category_drivers" model="manpower.service.category">
+            <field name="name">Drivers</field>
+            <field name="code">DRV</field>
+            <field name="sequence">60</field>
+            <field name="description">Drivers and transportation personnel</field>
+        </record>
+
+        <record id="category_technical" model="manpower.service.category">
+            <field name="name">Technical Maintenance</field>
+            <field name="code">TCH</field>
+            <field name="sequence">70</field>
+            <field name="description">Technical maintenance and repair services</field>
+        </record>
+
+        <record id="category_production" model="manpower.service.category">
+            <field name="name">Production Support</field>
+            <field name="code">PRD</field>
+            <field name="sequence">80</field>
+            <field name="description">Production line and manufacturing support</field>
+        </record>
+
+        <record id="category_office" model="manpower.service.category">
+            <field name="name">Office Support</field>
+            <field name="code">OFC</field>
+            <field name="sequence">90</field>
+            <field name="description">Office administration and support staff</field>
+        </record>
+
+        <record id="category_other" model="manpower.service.category">
+            <field name="name">Other</field>
+            <field name="code">OTH</field>
+            <field name="sequence">100</field>
+            <field name="description">Other miscellaneous services</field>
+        </record>
+    </data>
+</odoo>

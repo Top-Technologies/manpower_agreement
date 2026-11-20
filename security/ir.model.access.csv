@@ -1,0 +1,11 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_manpower_agreement_user,manpower.agreement.user,model_manpower_agreement,group_manpower_user,1,1,1,0
+access_manpower_agreement_manager,manpower.agreement.manager,model_manpower_agreement,group_manpower_manager,1,1,1,1
+access_manpower_amendment_user,manpower.agreement.amendment.user,model_manpower_agreement_amendment,group_manpower_user,1,0,0,0
+access_manpower_amendment_manager,manpower.agreement.amendment.manager,model_manpower_agreement_amendment,group_manpower_manager,1,1,1,1
+access_manpower_amendment_line_user,manpower.agreement.amendment.line.user,model_manpower_agreement_amendment_line,group_manpower_user,1,0,0,0
+access_manpower_amendment_line_manager,manpower.agreement.amendment.line.manager,model_manpower_agreement_amendment_line,group_manpower_manager,1,1,1,1
+access_manpower_service_category_user,manpower.service.category.user,model_manpower_service_category,group_manpower_user,1,0,0,0
+access_manpower_service_category_manager,manpower.service.category.manager,model_manpower_service_category,group_manpower_manager,1,1,1,1
+access_manpower_agreement_line_user,manpower.agreement.line.user,model_manpower_agreement_line,group_manpower_user,1,1,1,0
+access_manpower_agreement_line_manager,manpower.agreement.line.manager,model_manpower_agreement_line,group_manpower_manager,1,1,1,1

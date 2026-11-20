@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="seq_manpower_agreement" model="ir.sequence">
+        <field name="name">Manpower Agreement</field>
+        <field name="code">manpower.agreement</field>
+        <field name="prefix">MPA/%(year)s/</field>
+        <field name="padding">4</field>
+    </record>
+</odoo>
