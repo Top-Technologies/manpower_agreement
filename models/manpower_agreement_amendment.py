@@ -22,6 +22,44 @@ class ManpowerAgreementAmendment(models.Model):
         'manpower.agreement.amendment.line', 'amendment_id',
         string="Amendment Lines")
 
+    @api.model
+    def default_get(self, fields_list):
+        res = super().default_get(fields_list)
+        agreement_id = res.get('agreement_id') or self.env.context.get('default_agreement_id')
+        if agreement_id:
+            agreement = self.env['manpower.agreement'].browse(agreement_id)
+            if 'previous_qty' in fields_list:
+                res['previous_qty'] = agreement.manpower_qty
+            if 'amendment_line_ids' in fields_list and not res.get('amendment_line_ids'):
+                lines = []
+                for dist in agreement.manpower_distribution_ids:
+                    lines.append((0, 0, {
+                        'category_id': dist.category_id.id,
+                        'previous_male_qty': dist.male_qty,
+                        'previous_female_qty': dist.female_qty,
+                        'male_qty': dist.male_qty,
+                        'female_qty': dist.female_qty,
+                    }))
+                if lines:
+                    res['amendment_line_ids'] = lines
+        return res
+
+    @api.onchange('agreement_id')
+    def _onchange_agreement_id(self):
+        if self.agreement_id:
+            self.previous_qty = self.agreement_id.manpower_qty
+            if not self.amendment_line_ids and self.agreement_id.manpower_distribution_ids:
+                lines = []
+                for dist in self.agreement_id.manpower_distribution_ids:
+                    lines.append((0, 0, {
+                        'category_id': dist.category_id.id,
+                        'previous_male_qty': dist.male_qty,
+                        'previous_female_qty': dist.female_qty,
+                        'male_qty': dist.male_qty,
+                        'female_qty': dist.female_qty,
+                    }))
+                self.amendment_line_ids = lines
+
     @api.depends('amendment_line_ids.male_qty', 'amendment_line_ids.female_qty')
     def _compute_new_qty(self):
         """Compute new quantity from amendment lines."""
@@ -34,9 +72,13 @@ class ManpowerAgreementAmendment(models.Model):
     def create(self, vals_list):
         """Record the previous quantity and update agreement distribution."""
         for vals in vals_list:
-            if vals.get('agreement_id'):
-                agreement = self.env['manpower.agreement'].browse(vals['agreement_id'])
-                vals['previous_qty'] = agreement.manpower_qty
+            agreement_id = vals.get('agreement_id') or self.env.context.get('default_agreement_id')
+            if agreement_id:
+                if 'agreement_id' not in vals:
+                    vals['agreement_id'] = agreement_id
+                if not vals.get('previous_qty'):
+                    agreement = self.env['manpower.agreement'].browse(agreement_id)
+                    vals['previous_qty'] = agreement.manpower_qty
         
         records = super().create(vals_list)
         
@@ -111,6 +153,46 @@ class ManpowerAgreementAmendmentLine(models.Model):
          'UNIQUE(amendment_id, category_id)',
          'A service category can only appear once per amendment.')
     ]
+
+    @api.onchange('category_id')
+    def _onchange_category_id(self):
+        if self.category_id:
+            agreement = self.amendment_id.agreement_id or (
+                self.env['manpower.agreement'].browse(self.env.context.get('default_agreement_id'))
+                if self.env.context.get('default_agreement_id') else False
+            )
+            if agreement:
+                existing = agreement.manpower_distribution_ids.filtered(
+                    lambda l: l.category_id == self.category_id
+                )
+                if existing:
+                    self.previous_male_qty = existing[0].male_qty
+                    self.previous_female_qty = existing[0].female_qty
+                    if not self.male_qty and not self.female_qty:
+                        self.male_qty = existing[0].male_qty
+                        self.female_qty = existing[0].female_qty
+                else:
+                    self.previous_male_qty = 0
+                    self.previous_female_qty = 0
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('category_id'):
+                amend = self.env['manpower.agreement.amendment'].browse(vals.get('amendment_id')) if vals.get('amendment_id') else False
+                agreement = amend.agreement_id if amend else (
+                    self.env['manpower.agreement'].browse(self.env.context.get('default_agreement_id'))
+                    if self.env.context.get('default_agreement_id') else False
+                )
+                if agreement:
+                    cat_id = vals['category_id']
+                    dist = agreement.manpower_distribution_ids.filtered(lambda l: l.category_id.id == cat_id)
+                    if dist:
+                        if 'previous_male_qty' not in vals or not vals.get('previous_male_qty'):
+                            vals['previous_male_qty'] = dist[0].male_qty
+                        if 'previous_female_qty' not in vals or not vals.get('previous_female_qty'):
+                            vals['previous_female_qty'] = dist[0].female_qty
+        return super().create(vals_list)
 
     @api.depends('male_qty', 'female_qty')
     def _compute_total_qty(self):

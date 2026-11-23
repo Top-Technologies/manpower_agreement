@@ -147,7 +147,7 @@
                                 </form>
                             </field>
                         </page>
-                        <page string="Cost and Payment" name="cost">
+                        <page string="Cost and Payment" name="cost" invisible="1">
                             <group>
                                 <group>
                                     <field name="currency_id" invisible="1"/>
